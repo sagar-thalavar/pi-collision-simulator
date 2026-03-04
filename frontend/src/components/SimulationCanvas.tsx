@@ -48,11 +48,7 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
                     onCollisionUpdate(engine.collisions);
                 }
 
-                // Simulation is truly "done" for the UI when both blocks move far off screen to the right
-                const isOffScreen = engine.x1 > canvas.width && engine.x2 > canvas.width;
-                if (isOffScreen) {
-                    onFinish?.();
-                }
+                // Removed auto-finish logic. Simulation now runs until user clicks "End" or "Restart".
             }
 
             // Draw
