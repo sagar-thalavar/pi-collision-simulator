@@ -1,6 +1,5 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "dest": "https://pi-collision-backend.onrender.com/api/$1",
     "version": 2,
     "builds": [
         {
@@ -14,7 +13,7 @@
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "https://<YOUR‑RENDER‑BACKEND‑URL>/api/$1",
+            "dest": "https://pi-collision-backend.onrender.com/api/$1",
             "continue": true
         }
     ],
