@@ -44,24 +44,35 @@ function App() {
   const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed);
   };
-
+  // -------------------------------------------------------------------
+  // Backend verification helper – now mobile‑friendly and error‑safe
+  // -------------------------------------------------------------------
   const handleBackendVerify = async (mass1: number, mass2: number): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:3001/simulate', {
+      // Use a relative URL so Vercel proxies to the Render backend
+      const response = await fetch('/api/simulate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ massA: mass1, massB: mass2 }),
       });
+
       if (!response.ok) {
+        // Propagate HTTP errors (e.g., 500, 404) as a readable message
         throw new Error(`Server error: ${response.status}`);
       }
+
+      // Parse the JSON payload returned by the backend
       const data = await response.json();
-      return data.collisions !== undefined ? data.collisions.toString() : 'Error';
+
+      // The backend returns { collisions: <number> }
+      return data.collisions !== undefined
+        ? data.collisions.toString()
+        : 'Unexpected response';
     } catch (e) {
-      console.error(e);
-      return 'Failed to Connect';
+      console.error('Backend verification failed:', e);
+      return 'Failed to connect';
     }
   };
 
