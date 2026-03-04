@@ -34,13 +34,13 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
 
             // Update physics if playing OR if the math is completely finished (so they can glide)
             const engine = engineRef.current;
-            if (engine && (isPlaying || engine.isFinished)) {
+            if (engine && isPlaying) {
                 // limit dt to avoid huge jumps on tab switch
                 if (dt > 0.1) dt = 0.1;
 
                 let prevCollisions = engine.collisions;
-                // If finished, we just need basic movement updates (timeSteps=1), else high precision
-                const timeSteps = engine.isFinished ? 1 : 5000 * Math.max(1, playbackSpeed);
+                // Use much fewer substeps if finished (gliding) or a reasonable amount for active simulation
+                const timeSteps = engine.isFinished ? 1 : Math.min(2000, 500 * Math.max(1, playbackSpeed));
                 engine.update(dt * playbackSpeed, timeSteps);
 
                 // Only update react state if collisions changed to avoid too many re-renders
@@ -48,11 +48,9 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
                     onCollisionUpdate(engine.collisions);
                 }
 
-                // Call onFinish exactly once when it ticks over to finished
-                // Prevent infinite calls by checking if it was already finished before this step
-                if (engine.isFinished && !isPlaying) {
-                    // if it's finished and we already toggled playing off, do nothing
-                } else if (engine.isFinished && isPlaying) {
+                // Simulation is truly "done" for the UI when both blocks move far off screen to the right
+                const isOffScreen = engine.x1 > canvas.width && engine.x2 > canvas.width;
+                if (isOffScreen) {
                     onFinish?.();
                 }
             }
